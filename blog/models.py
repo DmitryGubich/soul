@@ -1,6 +1,5 @@
 import datetime
 
-from django import forms
 from django.db import models
 from django.http import Http404
 from django.utils.dateformat import DateFormat
@@ -10,9 +9,10 @@ from modelcluster.fields import ParentalManyToManyField, ParentalKey
 from taggit.models import TaggedItemBase, Tag as TaggitTag
 from wagtail.admin.edit_handlers import FieldPanel
 from wagtail.contrib.routable_page.models import route, RoutablePageMixin
-from wagtail.core.fields import RichTextField
 from wagtail.core.models import Page
 from wagtail.snippets.models import register_snippet
+
+from wagtailmd.utils import MarkdownField, MarkdownPanel
 
 
 class BlogPage(RoutablePageMixin, Page):
@@ -83,15 +83,13 @@ class BlogPage(RoutablePageMixin, Page):
 
 
 class PostPage(Page):
-    body = RichTextField(blank=True)
+    body = MarkdownField()
     date = models.DateTimeField(verbose_name="Post date", default=datetime.datetime.today)
     categories = ParentalManyToManyField('blog.BlogCategory', blank=True)
     tags = ClusterTaggableManager(through='blog.BlogPageTag', blank=True)
 
     content_panels = Page.content_panels + [
-        FieldPanel('body', classname="full"),
-        FieldPanel('categories', widget=forms.CheckboxSelectMultiple),
-        FieldPanel('tags'),
+        MarkdownPanel("body"),
     ]
 
     settings_panels = Page.settings_panels + [
