@@ -1,0 +1,12 @@
+{% load wagtailcore_tags %}
+
+{% block content %}
+    <h1>{{ blog_page.title }}</h1>
+
+    <div class="intro">{{ blog_page.description }}</div>
+
+    {% for post in posts %}
+        <h2><a href="{% pageurl post %}">{{ post.title }}</a></h2>
+    {% endfor %}
+
+{% endblock %}
