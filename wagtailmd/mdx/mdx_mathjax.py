@@ -23,5 +23,5 @@ class MathJaxExtension(markdown.Extension):
         md.inlinePatterns.add('mathjax', MathJaxPattern(md), '<escape')
 
 
-def makeExtension(configs=None):
-    return MathJaxExtension(configs)
+def makeExtension(*args, **kwargs):
+    return MathJaxExtension(*args, **kwargs)

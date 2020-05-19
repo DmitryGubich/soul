@@ -1,4 +1,4 @@
-{% load static wagtailcore_tags wagtailimages_tags wagtailuserbar blogapp_tags el_pagination_tags menu_tags wagtailmd compress %}
+{% load static wagtailcore_tags wagtailimages_tags wagtailuserbar blogapp_tags el_pagination_tags menu_tags wagtailmd %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -18,8 +18,9 @@
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css"
           integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
-
-
+    <link href="{% static 'blog/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'blog/css/blog-home.css' %}" rel="stylesheet">
+    <link href="{% static 'blog/css/default.css' %}" rel="stylesheet">
 </head>
 
 <body>
@@ -66,18 +67,16 @@
 <!-- Footer -->
 <footer class="py-5 bg-dark">
     <div class="container">
-        <p class="m-0 text-center text-white">Copyright &copy; 2017-2019 Built with <a
-                href="https://www.accordbox.com/blog/wagtail-tutorials/">wagtail-bootstrap-blog</a>
-        </p>
+        <p class="m-0 text-center text-white">Copyright &copy; 2020 </p>
     </div>
     <!-- /.container -->
 </footer>
 
 <!-- jQuery -->
-<script src="{% static 'blog/vendor/jquery/jquery.js' %}"></script>
+<script src="{% static 'blog/js/jquery.js' %}"></script>
 
 <!-- Bootstrap Core JavaScript -->
-<script src="{% static 'blog/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'blog/js/bootstrap.bundle.min.js' %}"></script>
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-39890589-7"></script>

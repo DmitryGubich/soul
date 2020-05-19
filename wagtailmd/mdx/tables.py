@@ -1,12 +1,16 @@
 """
 Tables Extension for Python-Markdown
 ====================================
+
 Added parsing of tables to Python-Markdown.
+
 A simple example:
+
     First Header  | Second Header
     ------------- | -------------
     Content Cell  | Content Cell
     Content Cell  | Content Cell
+
 Copyright 2009 - [Waylan Limberg](http://achinghead.com)
 """
 
@@ -94,5 +98,5 @@ class TableExtension(Extension):
                                       '<hashheader')
 
 
-def makeExtension(configs={}):
-    return TableExtension(configs=configs)
+def makeExtension(*args, **kwargs):
+    return TableExtension(*args, **kwargs)
