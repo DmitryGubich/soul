@@ -1,5 +1,6 @@
 import datetime
 
+from blog.blocks import TwoColumnBlock
 from django.db import models
 from django.http import Http404
 from django.utils.dateformat import DateFormat
@@ -7,9 +8,13 @@ from django.utils.formats import date_format
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalManyToManyField, ParentalKey
 from taggit.models import TaggedItemBase, Tag as TaggitTag
-from wagtail.admin.edit_handlers import FieldPanel
+from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel
 from wagtail.contrib.routable_page.models import route, RoutablePageMixin
+from wagtail.core import blocks
+from wagtail.core.fields import StreamField
 from wagtail.core.models import Page
+from wagtail.embeds.blocks import EmbedBlock
+from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.models import register_snippet
 
 from wagtailmd.utils import MarkdownField, MarkdownPanel
@@ -80,6 +85,29 @@ class BlogPage(RoutablePageMixin, Page):
             self.search_term = search_query
             self.search_type = 'search'
         return Page.serve(self, request, *args, **kwargs)
+
+
+class LandingPage(Page):
+    body = StreamField([
+        ('heading', blocks.CharBlock(classname="full title")),
+        ('paragraph', blocks.RichTextBlock()),
+        ('image', ImageChooserBlock(icon="image")),
+        ('two_columns', TwoColumnBlock()),
+        ('embedded_video', EmbedBlock(icon="media")),
+    ], null=True, blank=True)
+
+    content_panels = Page.content_panels + [
+        StreamFieldPanel('body'),
+    ]
+
+    @property
+    def blog_page(self):
+        return self.get_parent().specific
+
+    def get_context(self, request, *args, **kwargs):
+        context = super(LandingPage, self).get_context(request, *args, **kwargs)
+        context['blog_page'] = self.blog_page
+        return context
 
 
 class PostPage(Page):
