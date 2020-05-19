@@ -2,6 +2,9 @@ import datetime
 
 from django import forms
 from django.db import models
+from django.http import Http404
+from django.utils.dateformat import DateFormat
+from django.utils.formats import date_format
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalManyToManyField, ParentalKey
 from taggit.models import TaggedItemBase, Tag as TaggitTag
@@ -46,6 +49,27 @@ class BlogPage(RoutablePageMixin, Page):
     def post_list(self, request, *args, **kwargs):
         self.posts = self.get_posts()
         return Page.serve(self, request, *args, **kwargs)
+
+    @route(r'^(\d{4})/$')
+    @route(r'^(\d{4})/(\d{2})/$')
+    @route(r'^(\d{4})/(\d{2})/(\d{2})/$')
+    def post_by_date(self, request, year, month=None, day=None, *args, **kwargs):
+        self.posts = self.get_posts().filter(date__year=year)
+        if month:
+            self.posts = self.posts.filter(date__month=month)
+            df = DateFormat(datetime.date(int(year), int(month), 1))
+            self.search_term = df.format('F Y')
+        if day:
+            self.posts = self.posts.filter(date__day=day)
+            self.search_term = date_format(datetime.date(int(year), int(month), int(day)))
+        return Page.serve(self, request, *args, **kwargs)
+
+    @route(r'^(\d{4})/(\d{2})/(\d{2})/(.+)/$')
+    def post_by_date_slug(self, request, year, month, day, slug, *args, **kwargs):
+        post_page = self.get_posts().filter(slug=slug).first()
+        if not post_page:
+            raise Http404
+        return Page.serve(post_page, request, *args, **kwargs)
 
 
 class PostPage(Page):
