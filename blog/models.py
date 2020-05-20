@@ -1,6 +1,5 @@
 import datetime
 
-from blog.blocks import TwoColumnBlock
 from django.db import models
 from django.http import Http404
 from django.utils.dateformat import DateFormat
@@ -12,18 +11,19 @@ from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel
 from wagtail.contrib.routable_page.models import route, RoutablePageMixin
 from wagtail.core import blocks
 from wagtail.core.fields import StreamField
-from wagtail.core.models import Page
+from wagtailtrans.models import TranslatablePage
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.models import register_snippet
 
+from blog.blocks import TwoColumnBlock
 from wagtailmd.utils import MarkdownField, MarkdownPanel
 
 
-class BlogPage(RoutablePageMixin, Page):
+class BlogPage(RoutablePageMixin, TranslatablePage):
     description = models.CharField(max_length=255, blank=True, )
 
-    content_panels = Page.content_panels + [
+    content_panels = TranslatablePage.content_panels + [
         FieldPanel('description', classname="full")
     ]
 
@@ -41,19 +41,19 @@ class BlogPage(RoutablePageMixin, Page):
         self.search_type = 'tag'
         self.search_term = tag
         self.posts = self.get_posts().filter(tags__slug=tag)
-        return Page.serve(self, request, *args, **kwargs)
+        return TranslatablePage.serve(self, request, *args, **kwargs)
 
     @route(r'^category/(?P<category>[-\w]+)/$')
     def post_by_category(self, request, category, *args, **kwargs):
         self.search_type = 'category'
         self.search_term = category
         self.posts = self.get_posts().filter(categories__slug=category)
-        return Page.serve(self, request, *args, **kwargs)
+        return TranslatablePage.serve(self, request, *args, **kwargs)
 
     @route(r'^$')
     def post_list(self, request, *args, **kwargs):
         self.posts = self.get_posts()
-        return Page.serve(self, request, *args, **kwargs)
+        return TranslatablePage.serve(self, request, *args, **kwargs)
 
     @route(r'^(\d{4})/$')
     @route(r'^(\d{4})/(\d{2})/$')
@@ -67,14 +67,14 @@ class BlogPage(RoutablePageMixin, Page):
         if day:
             self.posts = self.posts.filter(date__day=day)
             self.search_term = date_format(datetime.date(int(year), int(month), int(day)))
-        return Page.serve(self, request, *args, **kwargs)
+        return TranslatablePage.serve(self, request, *args, **kwargs)
 
     @route(r'^(\d{4})/(\d{2})/(\d{2})/(.+)/$')
     def post_by_date_slug(self, request, year, month, day, slug, *args, **kwargs):
         post_page = self.get_posts().filter(slug=slug).first()
         if not post_page:
             raise Http404
-        return Page.serve(post_page, request, *args, **kwargs)
+        return TranslatablePage.serve(post_page, request, *args, **kwargs)
 
     @route(r'^search/$')
     def post_search(self, request, *args, **kwargs):
@@ -84,10 +84,10 @@ class BlogPage(RoutablePageMixin, Page):
             self.posts = self.posts.filter(body__contains=search_query)
             self.search_term = search_query
             self.search_type = 'search'
-        return Page.serve(self, request, *args, **kwargs)
+        return TranslatablePage.serve(self, request, *args, **kwargs)
 
 
-class LandingPage(Page):
+class LandingPage(TranslatablePage):
     body = StreamField([
         ('heading', blocks.CharBlock(classname="full title")),
         ('paragraph', blocks.RichTextBlock()),
@@ -96,7 +96,7 @@ class LandingPage(Page):
         ('embedded_video', EmbedBlock(icon="media")),
     ], null=True, blank=True)
 
-    content_panels = Page.content_panels + [
+    content_panels = TranslatablePage.content_panels + [
         StreamFieldPanel('body'),
     ]
 
@@ -110,17 +110,17 @@ class LandingPage(Page):
         return context
 
 
-class PostPage(Page):
+class PostPage(TranslatablePage):
     body = MarkdownField()
     date = models.DateTimeField(verbose_name="Post date", default=datetime.datetime.today)
     categories = ParentalManyToManyField('blog.BlogCategory', blank=True)
     tags = ClusterTaggableManager(through='blog.BlogPageTag', blank=True)
 
-    content_panels = Page.content_panels + [
+    content_panels = TranslatablePage.content_panels + [
         MarkdownPanel("body"),
     ]
 
-    settings_panels = Page.settings_panels + [
+    settings_panels = TranslatablePage.settings_panels + [
         FieldPanel('date'),
     ]
 

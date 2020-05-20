@@ -1,7 +1,7 @@
 from django.db import models
 
-from wagtail.core.models import Page
+from wagtailtrans.models import TranslatablePage
 
 
-class HomePage(Page):
+class HomePage(TranslatablePage):
     pass

@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
+from django.utils.translation import gettext_lazy as _
+
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
 
@@ -43,6 +45,7 @@ INSTALLED_APPS = [
     'wagtail.core',
     'wagtail.contrib.modeladmin',
 
+    'wagtailtrans',
     'wagtailmenus',
     'modelcluster',
     'taggit',
@@ -58,6 +61,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'wagtail.core.middleware.SiteMiddleware',
+    'wagtailtrans.middleware.TranslationMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -126,6 +131,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
+
+LANGUAGES = [
+    ('en', _('English')),
+    ('ru', _('Russian')),
+]
 
 TIME_ZONE = 'Europe/Minsk'
 
