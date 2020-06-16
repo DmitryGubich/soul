@@ -1,6 +1,8 @@
 import datetime
 
 from django.db import models
+from django.db.models import Q
+from django.forms import CheckboxSelectMultiple
 from django.http import Http404
 from django.utils.dateformat import DateFormat
 from django.utils.formats import date_format
@@ -11,10 +13,11 @@ from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel
 from wagtail.contrib.routable_page.models import route, RoutablePageMixin
 from wagtail.core import blocks
 from wagtail.core.fields import StreamField
-from wagtailtrans.models import TranslatablePage
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.snippets.models import register_snippet
+from wagtailtrans.models import TranslatablePage
 
 from blog.blocks import TwoColumnBlock
 from wagtailmd.utils import MarkdownField, MarkdownPanel
@@ -31,6 +34,8 @@ class BlogPage(RoutablePageMixin, TranslatablePage):
         context = super(BlogPage, self).get_context(request, *args, **kwargs)
         context['posts'] = self.posts
         context['blog_page'] = self
+        context['menu_items'] = self.get_children().filter(
+            live=True, show_in_menus=True)
         return context
 
     def get_posts(self):
@@ -55,22 +60,8 @@ class BlogPage(RoutablePageMixin, TranslatablePage):
         self.posts = self.get_posts()
         return TranslatablePage.serve(self, request, *args, **kwargs)
 
-    @route(r'^(\d{4})/$')
-    @route(r'^(\d{4})/(\d{2})/$')
-    @route(r'^(\d{4})/(\d{2})/(\d{2})/$')
-    def post_by_date(self, request, year, month=None, day=None, *args, **kwargs):
-        self.posts = self.get_posts().filter(date__year=year)
-        if month:
-            self.posts = self.posts.filter(date__month=month)
-            df = DateFormat(datetime.date(int(year), int(month), 1))
-            self.search_term = df.format('F Y')
-        if day:
-            self.posts = self.posts.filter(date__day=day)
-            self.search_term = date_format(datetime.date(int(year), int(month), int(day)))
-        return TranslatablePage.serve(self, request, *args, **kwargs)
-
-    @route(r'^(\d{4})/(\d{2})/(\d{2})/(.+)/$')
-    def post_by_date_slug(self, request, year, month, day, slug, *args, **kwargs):
+    @route(r'(.+)/$')
+    def post_by_slug(self, request, slug, *args, **kwargs):
         post_page = self.get_posts().filter(slug=slug).first()
         if not post_page:
             raise Http404
@@ -115,11 +106,19 @@ class PostPage(TranslatablePage):
     date = models.DateTimeField(verbose_name="Post date", default=datetime.datetime.today)
     categories = ParentalManyToManyField('blog.BlogCategory', blank=True)
     tags = ClusterTaggableManager(through='blog.BlogPageTag', blank=True)
+    header_image = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
 
     content_panels = TranslatablePage.content_panels + [
+        ImageChooserPanel('header_image'),
         MarkdownPanel("body"),
+        FieldPanel('categories', widget=CheckboxSelectMultiple),
+        FieldPanel('tags'),
     ]
-
     settings_panels = TranslatablePage.settings_panels + [
         FieldPanel('date'),
     ]

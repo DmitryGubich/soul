@@ -9,14 +9,10 @@ register = template.Library()
 
 
 @register.simple_tag()
-def post_date_url(post, blog_page):
-    post_date = post.date
+def post_slug_url(post, blog_page):
     url = blog_page.url + blog_page.reverse_subpage(
-        'post_by_date_slug',
+        'post_by_slug',
         args=(
-            post_date.year,
-            '{0:02}'.format(post_date.month),
-            '{0:02}'.format(post_date.day),
             post.slug,
         )
     )
@@ -61,7 +57,7 @@ def post_tags_list(context):
 def show_comments(context):
     blog_page = context['blog_page']
     post = context['post']
-    path = post_date_url(post, blog_page)
+    path = post_slug_url(post, blog_page)
 
     raw_url = context['request'].get_raw_uri()
     parse_result = six.moves.urllib.parse.urlparse(raw_url)
@@ -82,5 +78,5 @@ def show_comments(context):
 @register.simple_tag(takes_context=True)
 def canonical_url(context, post=None):
     if post and resolve(context.request.path_info).url_name == 'wagtail_serve':
-        return context.request.build_absolute_uri(post_date_url(post, post.blog_page))
+        return context.request.build_absolute_uri(post_slug_url(post, post.blog_page))
     return context.request.build_absolute_uri()

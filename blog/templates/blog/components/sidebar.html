@@ -1,21 +1,40 @@
-{% load static wagtailcore_tags wagtailimages_tags blogapp_tags wagtailroutablepage_tags %}
+{% load i18n static wagtailcore_tags wagtailimages_tags blogapp_tags wagtailroutablepage_tags %}
 
 <div class="col-md-4">
 
+    <div class="profile-sidebar">
+        <!-- SIDEBAR USERPIC -->
+        <div class="profile-userpic">
+            <img src="https://media-exp1.licdn.com/dms/image/C4D03AQHCx7Qunhe3sA/profile-displayphoto-shrink_200_200/0?e=1595462400&v=beta&t=G-uMyfYeklEp9RNNODI95ava_G5XBZhyBLZ37y7GpEQ"
+                 class="mx-auto d-block" alt="">
+        </div>
+        <div class="profile-usertitle">
+            <div class="profile-usertitle-name">
+                {% trans 'Dmitry Gubich' %}
+            </div>
+            <div class="profile-usertitle-job">
+                {% trans 'Python Software Engineer' %}
+            </div>
+            <div class="profile-usertitle-job">
+                {% trans 'Ableton lover' %}
+            </div>
+            <div class="profile-usertitle-job">
+                {% trans 'Dota player' %}
+            </div>
+        </div>
+    </div>
     <!-- Search Widget -->
     <div class="card my-4">
-        <h5 class="card-header">Search</h5>
+        <h5 class="card-header">{% trans 'Search' %}</h5>
         <div class="card-body">
             <form role="search" method="get" class="form-search" action="{% routablepageurl blog_page "post_search" %}">
-
                 <div class="input-group">
-                    <input type="text" class="form-control search-query" name="q" placeholder="Search&hellip;"
+                    <input type="text" class="form-control search-query" name="q" placeholder="{% trans 'Search' %}"
                            title="Search for:"/>
                     <span class="input-group-btn">
-            <button class="btn btn-secondary" type="button">Go!</button>
-          </span>
+                        <button class="btn btn-secondary" type="submit">{% trans 'Go!' %}</button>
+                    </span>
                 </div>
-
             </form>
         </div>
     </div>

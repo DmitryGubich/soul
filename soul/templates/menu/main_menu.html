@@ -1,10 +1,20 @@
-{% load menu_tags %}
+{% load static wagtailtrans_tags %}
+{% get_translations page homepage_fallback=False include_self=False as translations %}
 
-<ul class="navbar-nav ml-auto">
+<ul class="navbar-nav">
     {% for item in menu_items %}
-        <li class="nav-item">
+        <li class="nav-item active">
             <a href="{{ item.href }}" class="nav-link">
                 {{ item.text }}{% if item.has_children_in_menu %} <span class="sr-only"></span>{% endif %}</a>
+        </li>
+    {% endfor %}
+</ul>
+<ul class="navbar-nav ml-auto">
+    {% for language, page in translations.items %}
+        <li class="nav-item">
+            <a class="navbar-brand" href="{{ page.url }}">
+                <img src="/media/languages/{{ language.code }}.svg" width="30" height="30" alt="">
+            </a>
         </li>
     {% endfor %}
 </ul>

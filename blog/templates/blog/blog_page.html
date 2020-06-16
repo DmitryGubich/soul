@@ -1,12 +1,18 @@
 {% extends "blog/base.html" %}
-
-{% load static wagtailcore_tags wagtailimages_tags blogapp_tags el_pagination_tags wagtailmd %}
+{% load i18n static wagtailcore_tags wagtailimages_tags blogapp_tags el_pagination_tags wagtailmd %}
 
 {% block content %}
 
-    {% if search_term %}
+    {% if blog_page.search_term and posts %}
         <header class="page-header">
-            <h1 class="page-title">Search Results for <span>{{ search_type }}: {{ search_term }}</span></h1>
+            <h2 class="page-title">{% trans 'Search results for' %}<span> '{{ blog_page.search_term }}' :</span></h2>
+        </header>
+    {% elif blog_page.search_term and not posts%}
+        <header class="page-header">
+            <h2 class="page-title">
+                {% blocktrans with query=blog_page.search_term %}Search results for '{{ query }}' were not found.{% endblocktrans %}
+            </h2>
+            <img src="../../../media/images/nothing_found.png" class="card-img-top" alt=""/>
         </header>
     {% endif %}
 
@@ -17,14 +23,14 @@
 
             {% if post.header_image %}
                 {% image post.header_image original as header_image %}
-                <a href="{% post_date_url post blog_page %}">
+                <a href="{% post_slug_url post blog_page %}">
                     <img src="{{ header_image.url }}" class="card-img-top"></img>
                 </a>
             {% endif %}
 
             <div class="card-body">
                 <h2 class="card-title">
-                    <a href="{% post_date_url post blog_page %}">{{ post.title }}</a>
+                    <a href="{% post_slug_url post blog_page %}">{{ post.title }}</a>
                 </h2>
                 <p class="card-text">
                     {% if post.excerpt %}
@@ -33,11 +39,11 @@
                         {{ post.body|markdown|safe|truncatewords_html:70 }}
                     {% endif %}
                 </p>
-                <a href="{% post_date_url post blog_page %}" class="btn btn-primary">Read More &rarr;</a>
+                <a href="{% post_slug_url post blog_page %}" class="btn btn-primary">{% trans 'Read More' %} &rarr;</a>
 
             </div>
             <div class="card-footer text-muted">
-                Posted on {{ post.date }}
+                {% trans 'Posted on' %} {{ post.date }}
             </div>
         </div>
 
